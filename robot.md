@@ -277,8 +277,8 @@ Gateway runs on bot-00 for agent orchestration and messaging. Device paired ✓ 
 | Dashboard | `http://bot-00.local:18789` |
 | Config | `~/.openclaw/openclaw.json` |
 | Auth Mode | `token` |
-| Auth Token | `a079ab69f8bee99ea7392accc0b4f55a3bc0c7edfab55a3b` |
-| Password | `robot123` |
+| Auth Token | *(see ~/.openclaw/openclaw.json)* |
+| Password | *(see local config)* |
 
 ```bash
 # Service control (user service)
