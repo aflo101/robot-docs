@@ -35,7 +35,7 @@ The kids don't program robots — they teach them.
 │  │  ┌─────▼─────┐  │          └─────────────────────────────┘  │
 │  │  │  Arduino  │  │                                           │
 │  │  │  Mega2560 │  │          ┌─────────────────────────────┐  │
-│  │  └─────┬─────┘  │          │       claw-dev (Pi 4)       │  │
+│  │  └─────┬─────┘  │          │       claw-node01 (Pi 4)       │  │
 │  │        │        │          │       10.0.0.53             │  │
 │  │  Motors/Servos  │          │                             │  │
 │  │  Sensors        │          │  - OpenClaw orchestrator    │  │
@@ -51,12 +51,12 @@ The kids don't program robots — they teach them.
 | Host | IP | Role | Hardware |
 |------|----|------|----------|
 | alex-gtx | 10.0.0.40 | **OpenClaw orchestrator**, Gateway + WhatsApp channel, local inference | Windows 11, RTX 4080 16GB, WSL2 Ubuntu |
-| claw-dev | 10.0.0.51 (eth) / 10.0.0.53 (wifi) | OpenClaw testbed - NOT the robot | Raspberry Pi 4 |
+| claw-node01 | 10.0.0.51 (eth) / 10.0.0.53 (wifi) | OpenClaw testbed - NOT the robot | Raspberry Pi 4 |
 | **bot-00** | `bot-00.local` → **10.0.0.54** (WiFi) | **WALL·E robot brain** + local OpenClaw Gateway | Pi 5 8GB + Arduino Mega 2560 |
 
 **IMPORTANT:**
 - **bot-00** = The robot (Pi 5) = `ssh alex@bot-00.local` or `ssh alex@10.0.0.54`
-- **claw-dev** = Separate device, NOT the robot = `ssh alex@claw-dev.local` or `ssh alex@10.0.0.53` (wifi)
+- **claw-node01** = Separate device, NOT the robot = `ssh alex@claw-node01.local` or `ssh alex@10.0.0.53` (wifi)
 - Ethernet (.56) is currently down, use WiFi (.54) or mDNS (bot-00.local)
 - **OpenClaw node limitation:** `system.run` via nodes is macOS-only. Use SSH for bot-00 commands.
 
@@ -153,7 +153,7 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 
 ## Development Setup
 
-**Primary dev on bot-00.local** (use mDNS hostname - works on eth or wifi). alex-gtx WSL is the orchestrator with WhatsApp. claw-dev (10.0.0.53) is a testbed (standalone gateway).
+**Primary dev on bot-00.local** (use mDNS hostname - works on eth or wifi). alex-gtx WSL is the orchestrator with WhatsApp. claw-node01 (10.0.0.53) is a testbed (standalone gateway).
 
 ### Pi File Locations
 
