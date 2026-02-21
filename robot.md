@@ -160,9 +160,11 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 ```
 /home/alex/robot/
 ├── .venv/                # Python virtual environment
-├── face/
-│   └── face.py           # Animated face display (pygame)
-├── features/             # Kid-friendly feature scripts (21 total)
+├── core.py               # Main daemon - manages all hardware via socket
+├── client.py             # Client library for features to talk to daemon
+├── config.py             # Centralized configuration (paths, thresholds, etc.)
+├── wakeword.py           # Wake word listener + VAD + Vosk STT pipeline
+├── features/             # Kid-friendly feature scripts (20 total)
 │   ├── animal_quiz.py    # Animal sounds quiz (voice interactive)
 │   ├── counting.py       # Count together (voice interactive)
 │   ├── magic_word.py     # Polite words game (voice interactive)
@@ -184,12 +186,9 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 │   ├── smile_detect.py   # Smile celebration
 │   └── copycat.py        # Expression matching
 ├── health_check.py       # Boot health check (camera verification)
-├── motion.py             # Motion detection → triggers wave
 ├── override.py           # Bypass wake word - run actions directly
 ├── sketch/
 │   └── sketch.ino        # Arduino firmware
-├── wakeword.py           # Always-listening wake word + VAD + Vosk STT pipeline
-├── config.py             # Centralized configuration (paths, thresholds, etc.)
 ├── models/
 │   ├── hey_jarvis_v0.1.onnx  # Custom wake word model
 │   └── vosk-model-small-en-us-0.15/  # Local STT model
@@ -198,33 +197,78 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 └── test_arduino.py       # Serial communication test
 ```
 
-### Face + Motion System
+### Core Daemon Architecture
+
+The robot runs a socket-based daemon (`core.py`) that manages all hardware. Features connect via a simple client library.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    robot-core (daemon)                       │
+│                                                              │
+│  Managers:                                                   │
+│  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐        │
+│  │   LED   │  │ Speaker │  │   Mic   │  │ Camera  │        │
+│  │ (serial)│  │ (espeak)│  │ (Vosk)  │  │ (cv2)   │        │
+│  └─────────┘  └─────────┘  └─────────┘  └─────────┘        │
+│                                                              │
+│  ┌─────────┐  ┌─────────┐                                   │
+│  │  Face   │  │ Motion  │  (integrated, not separate)       │
+│  │ Display │  │ Detect  │                                   │
+│  └─────────┘  └─────────┘                                   │
+│                                                              │
+│  Unix Socket: /tmp/robot.sock                                │
+└─────────────────────────────────────────────────────────────┘
+        ▲
+        │ JSON messages
+        │
+┌───────┴───────┐
+│    Features   │  from client import connect
+│  (20 scripts) │  robot = connect()
+└───────────────┘  robot.speak("Hello!")
+```
 
 All services auto-start on boot via systemd user services (linger enabled):
 
 | Service | Description |
 |---------|-------------|
-| `robot-face` | Animated face display (pygame, DISPLAY=:0) |
-| `robot-motion` | Motion detection → wave greeting |
-| `robot-wakeword` | Wake word listener + 21 features |
+| `robot-core` | Main daemon - face, LED, speaker, mic, camera, motion detection |
+| `robot-wakeword` | Wake word listener + 20 features (depends on robot-core) |
 
 ```bash
 # Service control (user services, not sudo)
-systemctl --user start|stop|restart robot-face
-systemctl --user status robot-face
+systemctl --user start|stop|restart robot-core
+systemctl --user status robot-core
 
 # View logs
+journalctl --user -u robot-core -f
 journalctl --user -u robot-wakeword -f
 
-# Manual emotion trigger
-echo 'wave' > /tmp/robot_emotion
-
-# Available emotions: happy, sad, surprised, excited, sleepy, angry, wave, rps
+# Test client connection
+cd /home/alex/robot && .venv/bin/python3 -c "from client import connect; r = connect(); r.speak('Hello'); r.emotion('happy')"
 ```
 
-IPC via `/tmp/robot_emotion` - write emotion name or command to trigger.
+### Client API
 
-Motion threshold: 8000 pixels (moderate movement).
+Features use the socket client for all robot interactions:
+
+```python
+from client import connect
+
+robot = connect()
+robot.speak("Hello!", speed=150, pitch=50)  # Text-to-speech
+robot.led("on")      # LED on
+robot.led("off")     # LED off
+robot.led("pulse")   # LED pulse pattern
+robot.emotion("happy")  # Change face emotion
+robot.text("Hi!")    # Display text on face
+text = robot.listen(3)  # Listen for speech (3 seconds)
+faces = robot.detect_faces()  # Camera face detection
+smiles = robot.detect_smiles()  # Camera smile detection
+```
+
+Available emotions: `happy`, `sad`, `surprised`, `excited`, `sleepy`, `angry`, `wave`, `rps`, `listening`, `thinking`
+
+Motion detection runs in daemon background - auto-triggers wave on movement.
 
 ### Voice Control
 
