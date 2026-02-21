@@ -162,7 +162,7 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 ├── .venv/                # Python virtual environment
 ├── face/
 │   └── face.py           # Animated face display (pygame)
-├── features/             # Kid-friendly feature scripts (19 total)
+├── features/             # Kid-friendly feature scripts (21 total)
 │   ├── animal_quiz.py    # Animal sounds quiz (voice interactive)
 │   ├── counting.py       # Count together (voice interactive)
 │   ├── magic_word.py     # Polite words game (voice interactive)
@@ -198,30 +198,26 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 
 ### Face + Motion System
 
-All services auto-start on boot via systemd:
+All services auto-start on boot via systemd user services (linger enabled):
 
 | Service | Description |
 |---------|-------------|
-| `robot-health` | Boot health check (camera verification) |
-| `robot-face` | Animated face display |
-| `robot-motion` | Motion detection → wave |
-| `robot-wakeword` | Always-listening wake word detection |
+| `robot-face` | Animated face display (pygame, DISPLAY=:0) |
+| `robot-motion` | Motion detection → wave greeting |
+| `robot-wakeword` | Wake word listener + 21 features |
 
 ```bash
-# Service control
-sudo systemctl start|stop|restart robot-face
-sudo systemctl start|stop|restart robot-motion
+# Service control (user services, not sudo)
+systemctl --user start|stop|restart robot-face
+systemctl --user status robot-face
 
-# View motion log
-tail -f /tmp/motion.log
+# View logs
+journalctl --user -u robot-wakeword -f
 
-# Manual wave trigger
+# Manual emotion trigger
 echo 'wave' > /tmp/robot_emotion
 
-# Available emotions: happy, sad, surprised, excited, sleepy, angry, wave
-
-# Rock Paper Scissors game
-echo 'rps' > /tmp/robot_emotion
+# Available emotions: happy, sad, surprised, excited, sleepy, angry, wave, rps
 ```
 
 IPC via `/tmp/robot_emotion` - write emotion name or command to trigger.
@@ -264,7 +260,7 @@ ssh alex@bot-00.local "python3 /home/alex/robot/override.py countdown"
 ssh alex@bot-00.local "python3 /home/alex/robot/override.py --list"  # Show all
 
 # Watch wake word listener in real time
-journalctl -u robot-wakeword -f
+journalctl --user -u robot-wakeword -f
 ```
 
 ### OpenClaw Gateway (on bot-00)
