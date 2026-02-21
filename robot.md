@@ -189,6 +189,7 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 ├── sketch/
 │   └── sketch.ino        # Arduino firmware
 ├── wakeword.py           # Always-listening wake word + VAD + Vosk STT pipeline
+├── config.py             # Centralized configuration (paths, thresholds, etc.)
 ├── models/
 │   ├── hey_jarvis_v0.1.onnx  # Custom wake word model
 │   └── vosk-model-small-en-us-0.15/  # Local STT model
