@@ -188,10 +188,11 @@ Current status: Phase 3 complete (kid features). Next: chassis/physical build.
 ├── override.py           # Bypass wake word - run actions directly
 ├── sketch/
 │   └── sketch.ino        # Arduino firmware
-├── stt.py                # Speech-to-text (legacy, unused)
-├── listen.py             # Voice command listener (trigger-based)
 ├── wakeword.py           # Always-listening wake word + VAD + Vosk STT pipeline
-├── models/               # hey_jarvis_v0.1.onnx (built-in) + Vosk model
+├── models/
+│   ├── hey_jarvis_v0.1.onnx  # Custom wake word model
+│   └── vosk-model-small-en-us-0.15/  # Local STT model
+├── requirements.txt      # Python dependencies
 ├── train_wakeword/       # Scripts to train custom wake words on GPU (archived)
 └── test_arduino.py       # Serial communication test
 ```
