@@ -260,13 +260,16 @@ robot.led("on")      # LED on
 robot.led("off")     # LED off
 robot.led("pulse")   # LED pulse pattern
 robot.emotion("happy")  # Change face emotion
-robot.text("Hi!")    # Display text on face
+robot.text("Hi!")    # Display text on face (large if 1-2 chars)
+robot.rps("rock")    # Display rock/paper/scissors graphic
 text = robot.listen(3)  # Listen for speech (3 seconds)
 faces = robot.detect_faces()  # Camera face detection
 smiles = robot.detect_smiles()  # Camera smile detection
 ```
 
-Available emotions: `happy`, `sad`, `surprised`, `excited`, `sleepy`, `angry`, `wave`, `rps`, `listening`, `thinking`
+Available emotions: `happy`, `sad`, `surprised`, `excited`, `sleepy`, `angry`, `wave`, `listening`, `thinking`
+
+Display modes: `text` (large if 1-2 chars, wrapped if longer), `rps` (rock/paper/scissors graphics)
 
 Motion detection runs in daemon background - auto-triggers wave on movement.
 
