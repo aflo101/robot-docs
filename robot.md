@@ -1,4 +1,4 @@
-Robot Fleet Project - AI-powered robots with the kids
+<!-- CLAUDE: Before editing, pull from origin. After editing, push to origin. -->
 
 # Robot Fleet Project
 
