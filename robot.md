@@ -52,12 +52,12 @@ The kids don't program robots — they teach them.
 |------|----|------|----------|
 | alex-gtx | 10.0.0.40 | **OpenClaw orchestrator**, Gateway + WhatsApp channel, local inference | Windows 11, RTX 4080 16GB, WSL2 Ubuntu |
 | claw-node01 | 10.0.0.51 (eth) / 10.0.0.53 (wifi) | OpenClaw testbed - NOT the robot | Raspberry Pi 4 |
-| **bot-00** | `bot-00.local` → **10.0.0.54** (WiFi) | **WALL·E robot brain** + local OpenClaw Gateway | Pi 5 8GB + Arduino Mega 2560 |
+| **bot-00** | `bot-00.local` → **10.0.0.36** (WiFi) | **WALL·E robot brain** + local OpenClaw Gateway | Pi 5 8GB + Arduino Mega 2560 |
 
 **IMPORTANT:**
-- **bot-00** = The robot (Pi 5) = `ssh alex@bot-00.local` or `ssh alex@10.0.0.54`
+- **bot-00** = The robot (Pi 5) = `ssh alex@bot-00.local` or `ssh alex@10.0.0.36`
 - **claw-node01** = Separate device, NOT the robot = `ssh alex@claw-node01.local` or `ssh alex@10.0.0.53` (wifi)
-- Ethernet (.56) is currently down, use WiFi (.54) or mDNS (bot-00.local)
+- IP is DHCP and has drifted (was .54 → now .36 as of 2026-07-10) — prefer `bot-00.local` (mDNS) over the raw IP.
 - **OpenClaw node limitation:** `system.run` via nodes is macOS-only. Use SSH for bot-00 commands.
 
 ## Unit 1 - The Prototype
