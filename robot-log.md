@@ -18,7 +18,9 @@ Append-only progress tracking. Agents and humans write here freely from any devi
   - `loginctl enable-linger alex` so user services start at boot. All persisted.
 - [x] Result: `robot-core` + `robot-wakeword` (user) stable, wakeword listening (NRestarts=0), TTS + mic + camera + face all working.
 - [x] **Camera services cleaned up:** both broken-by-design now that `core.py` owns `/dev/video0` exclusively. `robot-health` = one-shot boot check doing direct `cv2.VideoCapture(0)` (always fails, wrong python); `robot-motion` = service pointing at a **missing** `motion.py` (only `motion.py.old` left) → crash-looped on file-not-found. **Both stopped + disabled**, failed state cleared. bot-00 all-green (face + core + wakeword active; nothing failed).
-- [ ] **Parked for strategy pass:** revive presence-greeting via `core.py`'s `detect_faces` (in-daemon), not a separate motion service. Games library issues in project.md, parked pending strategy.
+- [x] **Presence greeter shipped:** replaced the old motion-diff `MotionDetector` in `core.py` with `PresenceGreeter` — `detect_faces`-triggered, visual wave + LED pulse, 5s cooldown, arrival-only, idle-gated (quiet during games via `face.last_activity`). Ambient "robot notices you" for the 3 & 5yo. `--no-greet` to disable.
+- [x] **Rock Paper Scissors v1 shipped:** rewrote `features/rock_paper_scissors.py` visual-first (audio deprioritized) — 3-2-1-GO countdown + LED, throw revealed as the face RPS graphic. No input capture (kids self-judge); v2 = capture/auto-score. Voice triggers already mapped.
+- [ ] **Still parked for strategy pass:** rest of games library (smile_detect typo, stubbed rhythm_game/simon_says/treasure_hunt, no error handling).
 
 ---
 
