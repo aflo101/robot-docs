@@ -4,6 +4,23 @@ Append-only progress tracking. Agents and humans write here freely from any devi
 
 ---
 
+## Jul 10, 2026
+
+### bot-00 revived + audio stack fixed (project pulled to ~/Desktop/robot-fleet)
+- [x] bot-00 IP drifted .54 → **10.0.0.36** (DHCP). Use `bot-00.local`. `robot.md` updated.
+- [x] **Root cause of dead wakeword:** Pi was re-flashed to a **PipeWire**-based Raspberry Pi OS. PipeWire monopolized the Blue mic (the only audio device — mic *and* speaker on card 1). Robot code uses raw ALSA (`arecord -D plughw:1,0`) → every capture hit "device busy" → `wakeword.py` read EOF, hit a silent `break`, exited 0; `Restart=on-failure` never restarted it. A duplicate **user** `robot-wakeword` (`Restart=always`) respawned it endlessly under the broken mic = the "orphan" churn.
+- [x] **Fix — made bot-00 ALSA-only:**
+  - Masked user PipeWire trio (`pipewire`, `pipewire-pulse`, `wireplumber`).
+  - Added `/etc/asound.conf` → ALSA `default` = `hw:1,0` (Blue card).
+  - `core.py speak()`: `espeak` (dead JACK backend) → `espeak --stdout | aplay -D plughw:1,0`. TTS verified OK + audible.
+  - `wakeword.py`: silent EOF `break` → `sys.exit(1)`.
+  - Disabled duplicate **system** `robot-wakeword`; kept **user** one (`Restart=always`).
+  - `loginctl enable-linger alex` so user services start at boot. All persisted.
+- [x] Result: `robot-core` + `robot-wakeword` (user) stable, wakeword listening (NRestarts=0), TTS + mic + camera + face all working.
+- [ ] **Not touched:** camera services `robot-health` (failed) / `robot-motion` (disabled) — camera-race artifacts, deferred. Games library issues logged in project.md, parked pending strategy.
+
+---
+
 ## Feb 16, 2026
 
 ### Wake Word Switch
